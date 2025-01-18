@@ -27,3 +27,9 @@ Run Your Script: Once everything is set up, try running the script again:
  ```bash
 python3 auto_clicker.py
  ```
+
+Install Dependencies:
+Make sure you have the necessary packages installed:
+ ```bash
+pip install pyautogui keyboard python-dotenv
+```
