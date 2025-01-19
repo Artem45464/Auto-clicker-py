@@ -22,3 +22,9 @@ cd /Users/your user name/Desktop/Auto-clicker-py
 source .venv/bin/activate
 ```
 If your terminal prompt shows (.venv) at the beginning, it indicates that the virtual environment is active.
+
+# Run Script as Administrator:
+To run the Python script as an administrator on macOS, you can prepend sudo to your script execution in the terminal:
+```badh
+sudo python3 main.py
+```
