@@ -3,13 +3,13 @@ import time
 import threading
 
 # Define global variables
-running = False
 mouse_controller = Controller()
+running_event = threading.Event()
 
 # Function for auto-clicking logic, ensuring 20 CPS
-def auto_click(target_cps=20):  # Target CPS = 20
+def auto_click(target_cps=20):
     interval = 1 / target_cps  # Calculate target interval (0.05 seconds)
-    while running:
+    while running_event.is_set():  # Check if the event is set (running)
         start_time = time.perf_counter()  # Track time before click
         mouse_controller.click(Button.left, 1)  # Perform the click
         end_time = time.perf_counter()  # Track time after click
@@ -21,16 +21,14 @@ def auto_click(target_cps=20):  # Target CPS = 20
 
 # Start clicking
 def start_click(target_cps=20):  # Start at 20 CPS
-    global running
-    if not running:
-        running = True
+    if not running_event.is_set():
+        running_event.set()  # Set the event to indicate that clicking is running
         print(f"Auto-clicker started with {target_cps} clicks per second.")
-        threading.Thread(target=auto_click, args=(target_cps,)).start()
+        threading.Thread(target=auto_click, args=(target_cps,), daemon=True).start()
 
 # Stop clicking
 def stop_click():
-    global running
-    running = False
+    running_event.clear()  # Clear the event to stop clicking
     print("Auto-clicker stopped.")
 
 # Main function for user control
