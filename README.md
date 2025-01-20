@@ -28,3 +28,13 @@ To run the Python script as an administrator on macOS, you can prepend sudo to y
 ```badh
 sudo python3 main.py
 ```
+# Verify pynput Version
+Check the current installed version:
+```badh
+pip show pynput
+```
+
+ update to the latest version
+```badh
+pip install --upgrade pynput
+```
