@@ -1,36 +1,58 @@
 import time
-import threading
-import keyboard
 from pynput.mouse import Button, Controller
+from pynput.keyboard import Listener
+import threading
 
 # Initialize mouse controller
 mouse = Controller()
-click_event = threading.Event()
+auto_clicking = False
+click_timer = None
 
-def auto_click(cps=20):
-    interval = 1 / cps
-    while click_event.is_set():
+def perform_click():
+    """Click once and reschedule next click"""
+    if auto_clicking:
         mouse.click(Button.left, 1)
-        time.sleep(interval)
+        click_timer = threading.Timer(0.05, perform_click)  # Delay adjusted for 20 CPS
+        click_timer.start()
+
+def start_auto_clicking():
+    """Start auto-clicking"""
+    global auto_clicking
+    auto_clicking = True
+    perform_click()  # Perform the first click and schedule subsequent ones
+
+def stop_auto_clicking():
+    """Stop auto-clicking"""
+    global auto_clicking
+    auto_clicking = False
+    if click_timer:
+        click_timer.cancel()  # Cancel any future clicks
+
+def on_press(key):
+    """Handles key press events"""
+    try:
+        if hasattr(key, 'char'):
+            if key.char == 'k':  # Start/Stop auto-clicking on 'k' press
+                if not auto_clicking:
+                    start_auto_clicking()
+                    print("Auto-clicker started.")
+                else:
+                    stop_auto_clicking()
+                    print("Auto-clicker stopped.")
+
+            elif key.char == 'q':  # Exit the program on 'q'
+                stop_auto_clicking()
+                print("Exiting program.")
+                return False  # Exit listener
+    except AttributeError:
+        pass  # If key doesn't have 'char', skip it
 
 def main():
+    """Main function to run the listener"""
     print("Press 'k' to start/stop auto-clicker, 'q' to quit.")
-    while True:
-        if keyboard.is_pressed('k'):
-            if click_event.is_set():
-                click_event.clear()
-                print("Auto-clicker stopped.")
-            else:
-                click_event.set()
-                threading.Thread(target=auto_click, daemon=True).start()
-                print("Auto-clicker started.")
-            time.sleep(0.3)  # Prevents multiple triggers from one keypress
-
-        if keyboard.is_pressed('q'):
-            click_event.clear()
-            print("Exiting program.")
-            break
-        time.sleep(0.1)
+    # Start the keyboard listener
+    with Listener(on_press=on_press) as listener:
+        listener.join()
 
 if __name__ == "__main__":
     main()
