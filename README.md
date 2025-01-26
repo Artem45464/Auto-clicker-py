@@ -26,7 +26,7 @@ If your terminal prompt shows (.venv) at the beginning, it indicates that the vi
 # Run Script as Administrator:
 To run the Python script as an administrator on macOS, you can prepend sudo to your script execution in the terminal:
 ```badh
-sudo python3 main.py
+python3.12 main.py
 ```
 # Verify pynput Version
 Check the current installed version:
