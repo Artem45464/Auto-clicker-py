@@ -31,10 +31,10 @@ python3 main.py
 # Verify pynput Version
 Check the current installed version:
 ```badh
-pip show pynput
+pip3 show pynput
 ```
 
  update to the latest version
 ```badh
-pip install --upgrade pynput
+pip3 install --upgrade pynput
 ```
