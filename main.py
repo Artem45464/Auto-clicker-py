@@ -10,9 +10,10 @@ click_timer = None
 
 def perform_click():
     """Click once and reschedule next click."""
+    global click_timer  # Ensure click_timer is treated as global
     if auto_clicking:
         mouse.click(Button.left, 1)
-        click_timer = threading.Timer(0.2, perform_click)  # Slower clicking for 5 CPS
+        click_timer = threading.Timer(0.05, perform_click)  # Adjusted for 20 CPS (0.05 seconds)
         click_timer.start()
 
 def start_auto_clicking():
@@ -30,6 +31,8 @@ def stop_auto_clicking():
     global auto_clicking
     if auto_clicking:
         auto_clicking = False
+        if click_timer:
+            click_timer.cancel()  # Cancel any ongoing click timer
         print("Auto-clicker stopped.")
     else:
         print("Auto-clicker is not running.")
