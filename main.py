@@ -9,7 +9,7 @@ auto_clicking = False
 def auto_click():
     """Continuously clicks at 20 CPS until stopped, adjusting dynamically."""
     global auto_clicking
-    target_cps = 20  # Target CPS
+    target_cps = 20  # Target CPS is now 20
     interval = 1 / target_cps  # Interval per click
     correction = 0  # Adjustment factor
 
@@ -25,7 +25,7 @@ def auto_click():
         actual_elapsed = time.perf_counter() - start_time
         correction = (actual_elapsed - interval) * 0.1  # Smooth correction
 
-def toggle_auto_clicking(event=None):
+def toggle_auto_clicking():
     """Toggle auto-clicking state."""
     global auto_clicking
     if auto_clicking:
@@ -47,7 +47,7 @@ def stop_auto_clicking():
     auto_clicking = False
     print("Auto-clicker stopped.")
 
-def exit_program(event=None):
+def exit_program():
     """Exit the program safely."""
     stop_auto_clicking()
     print("Exiting program.")
@@ -58,8 +58,8 @@ def main():
     print("Press 'k' to start/stop the auto-clicker.")
     print("Press 'q' to exit the program.")
 
-    keyboard.on_press_key("x", toggle_auto_clicking)
-    keyboard.on_press_key("q", exit_program)
+    keyboard.add_hotkey('k', toggle_auto_clicking)
+    keyboard.add_hotkey('q', exit_program)
 
     keyboard.wait()  # Keep the script running
 
