@@ -3,57 +3,65 @@ import threading
 from pynput.mouse import Button, Controller
 import keyboard
 
-# Initialize mouse controller
 mouse = Controller()
 auto_clicking = False
-click_timer = None
 
-def perform_click():
-    """Click once and reschedule next click."""
-    global click_timer  # Ensure click_timer is treated as global
-    if auto_clicking:
+def auto_click():
+    """Continuously clicks at 20 CPS until stopped, adjusting dynamically."""
+    global auto_clicking
+    target_cps = 20  # Target CPS
+    interval = 1 / target_cps  # Interval per click
+    correction = 0  # Adjustment factor
+
+    while auto_clicking:
+        start_time = time.perf_counter()
         mouse.click(Button.left, 1)
-        click_timer = threading.Timer(0.05, perform_click)  # Adjusted for 20 CPS (0.05 seconds)
-        click_timer.start()
+        elapsed = time.perf_counter() - start_time
+        
+        # Adjust for delays dynamically
+        time.sleep(max(0, interval - elapsed - correction))
+        
+        # Recalculate correction factor
+        actual_elapsed = time.perf_counter() - start_time
+        correction = (actual_elapsed - interval) * 0.1  # Smooth correction
+
+def toggle_auto_clicking(event=None):
+    """Toggle auto-clicking state."""
+    global auto_clicking
+    if auto_clicking:
+        stop_auto_clicking()
+    else:
+        start_auto_clicking()
 
 def start_auto_clicking():
-    """Start auto-clicking."""
+    """Start auto-clicking in a separate thread."""
     global auto_clicking
-    if not auto_clicking:  # Start only if not running already
+    if not auto_clicking:
         auto_clicking = True
-        perform_click()  # Start the first click and schedule subsequent ones
+        threading.Thread(target=auto_click, daemon=True).start()
         print("Auto-clicker started.")
-    else:
-        print("Auto-clicker is already running.")
 
 def stop_auto_clicking():
     """Stop auto-clicking."""
     global auto_clicking
-    if auto_clicking:
-        auto_clicking = False
-        if click_timer:
-            click_timer.cancel()  # Cancel any ongoing click timer
-        print("Auto-clicker stopped.")
-    else:
-        print("Auto-clicker is not running.")
+    auto_clicking = False
+    print("Auto-clicker stopped.")
+
+def exit_program(event=None):
+    """Exit the program safely."""
+    stop_auto_clicking()
+    print("Exiting program.")
+    exit(0)
 
 def main():
-    """Main function to monitor keypresses."""
+    """Monitor keypresses."""
     print("Press 'k' to start/stop the auto-clicker.")
     print("Press 'q' to exit the program.")
-    
-    while True:
-        if keyboard.is_pressed('k'):
-            if not auto_clicking:
-                start_auto_clicking()
-            else:
-                stop_auto_clicking()
-            time.sleep(0.3)  # Slight delay to avoid repeating while key is held
 
-        if keyboard.is_pressed('q'):
-            stop_auto_clicking()
-            print("Exiting program.")
-            break  # Exit the loop and end the program
+    keyboard.on_press_key("x", toggle_auto_clicking)
+    keyboard.on_press_key("q", exit_program)
+
+    keyboard.wait()  # Keep the script running
 
 if __name__ == "__main__":
     main()
