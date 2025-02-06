@@ -14,7 +14,7 @@ def auto_click():
     correction = 0  # Adjustment factor
 
     while auto_clicking:
-        start_time = time.perf_counter()
+        start_time = time.perf_counter()  # Capture time right before click
         mouse.click(Button.left, 1)
         elapsed = time.perf_counter() - start_time
         
@@ -58,7 +58,7 @@ def main():
     print("Press 'k' to start/stop the auto-clicker.")
     print("Press 'q' to exit the program.")
 
-    keyboard.add_hotkey('k', toggle_auto_clicking)
+    keyboard.add_hotkey('x', toggle_auto_clicking)
     keyboard.add_hotkey('q', exit_program)
 
     keyboard.wait()  # Keep the script running
