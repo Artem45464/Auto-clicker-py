@@ -58,7 +58,7 @@ def main():
     print("Press 'k' to start/stop the auto-clicker.")
     print("Press 'q' to exit the program.")
 
-    keyboard.add_hotkey('x', toggle_auto_clicking)
+    keyboard.add_hotkey('k', toggle_auto_clicking)
     keyboard.add_hotkey('q', exit_program)
 
     keyboard.wait()  # Keep the script running
