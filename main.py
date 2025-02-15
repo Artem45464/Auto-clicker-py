@@ -4,47 +4,37 @@ from pynput.mouse import Button, Controller
 import keyboard
 
 mouse = Controller()
-auto_clicking = False
+auto_clicking = threading.Event()  # Use Event for thread safety
 
 def auto_click():
-    """Continuously clicks at 20 CPS until stopped, adjusting dynamically."""
-    global auto_clicking
+    """Continuously clicks at 20 CPS until stopped, with accurate timing."""
     target_cps = 20  # Target CPS is now 20
     interval = 1 / target_cps  # Interval per click
-    correction = 0  # Adjustment factor
-
-    while auto_clicking:
-        start_time = time.perf_counter()  # Capture time right before click
+    next_time = time.perf_counter() + interval  # Track precise timing
+    
+    while auto_clicking.is_set():
         mouse.click(Button.left, 1)
-        elapsed = time.perf_counter() - start_time
-        
-        # Adjust for delays dynamically
-        time.sleep(max(0, interval - elapsed - correction))
-        
-        # Recalculate correction factor
-        actual_elapsed = time.perf_counter() - start_time
-        correction = (actual_elapsed - interval) * 0.1  # Smooth correction
+        next_time += interval
+        sleep_time = max(0, next_time - time.perf_counter())
+        time.sleep(sleep_time)  # Maintain exact CPS
 
 def toggle_auto_clicking():
     """Toggle auto-clicking state."""
-    global auto_clicking
-    if auto_clicking:
+    if auto_clicking.is_set():
         stop_auto_clicking()
     else:
         start_auto_clicking()
 
 def start_auto_clicking():
     """Start auto-clicking in a separate thread."""
-    global auto_clicking
-    if not auto_clicking:
-        auto_clicking = True
+    if not auto_clicking.is_set():
+        auto_clicking.set()
         threading.Thread(target=auto_click, daemon=True).start()
         print("Auto-clicker started.")
 
 def stop_auto_clicking():
     """Stop auto-clicking."""
-    global auto_clicking
-    auto_clicking = False
+    auto_clicking.clear()
     print("Auto-clicker stopped.")
 
 def exit_program():
