@@ -4,7 +4,7 @@ from pynput.mouse import Button, Controller
 import keyboard
 
 mouse = Controller()
-auto_clicking = threading.Event()  # Use Event for thread safety
+auto_clicking = threading.Event()
 
 def auto_click():
     """Continuously clicks at 20 CPS until stopped, with accurate timing."""
@@ -37,21 +37,22 @@ def stop_auto_clicking():
     auto_clicking.clear()
     print("Auto-clicker stopped.")
 
-def exit_program():
-    """Exit the program safely."""
-    stop_auto_clicking()
-    print("Exiting program.")
-    exit(0)
-
 def main():
     """Monitor keypresses."""
     print("Press 'k' to start/stop the auto-clicker.")
     print("Press 'q' to exit the program.")
-
-    keyboard.add_hotkey('k', toggle_auto_clicking)
-    keyboard.add_hotkey('q', exit_program)
-
-    keyboard.wait()  # Keep the script running
+    
+    while True:
+        if keyboard.is_pressed('x'):  # Start/stop the auto-clicker with 'k'
+            toggle_auto_clicking()
+            time.sleep(0.2)  # To avoid multiple toggles on a single key press
+        
+        if keyboard.is_pressed('q'):  # Exit the program with 'q'
+            stop_auto_clicking()
+            print("Exiting program.")
+            break
+        
+        time.sleep(0.1)  # Polling interval for key press detection
 
 if __name__ == "__main__":
     main()
