@@ -43,7 +43,7 @@ def main():
     print("Press 'q' to exit the program.")
     
     while True:
-        if keyboard.is_pressed('x'):  # Start/stop the auto-clicker with 'k'
+        if keyboard.is_pressed('k'):  # Start/stop the auto-clicker with 'k'
             toggle_auto_clicking()
             time.sleep(0.2)  # To avoid multiple toggles on a single key press
         
