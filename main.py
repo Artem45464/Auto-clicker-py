@@ -13,9 +13,13 @@ def auto_click():
     next_time = time.perf_counter() + interval  # Track precise timing
     
     while auto_clicking.is_set():
-        mouse.click(Button.left, 1)
         next_time += interval
         sleep_time = max(0, next_time - time.perf_counter())
+
+        if not auto_clicking.is_set():  # Ensure instant stopping
+            break
+
+        mouse.click(Button.left, 1)
         time.sleep(sleep_time)  # Maintain exact CPS
 
 def toggle_auto_clicking():
@@ -45,8 +49,9 @@ def main():
     while True:
         if keyboard.is_pressed('k'):  # Start/stop the auto-clicker with 'k'
             toggle_auto_clicking()
-            time.sleep(0.2)  # To avoid multiple toggles on a single key press
-        
+            while keyboard.is_pressed('k'):  # Wait for key release to prevent multiple toggles
+                time.sleep(0.05)
+
         if keyboard.is_pressed('q'):  # Exit the program with 'q'
             stop_auto_clicking()
             print("Exiting program.")
