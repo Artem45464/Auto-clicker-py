@@ -12,7 +12,6 @@ def auto_click():
     target_cps = 20  
     interval = 1 / target_cps  
     next_time = time.perf_counter()
-
     while auto_clicking.is_set():
         mouse.click(Button.left, 1)
         next_time += interval
@@ -45,17 +44,15 @@ def main():
     with print_lock:
         print("Press 'k' to start/stop the auto-clicker.")
         print("Press 'q' to exit the program.")
-
-    while True:
-        keyboard.wait('k')
-        toggle_auto_clicking()
-        time.sleep(0.1)  # Prevent rapid toggling
-
-        if keyboard.is_pressed('q'):  # Exit the program with 'q'
-            stop_auto_clicking()
-            with print_lock:
-                print("Exiting program.", flush=True)
-            break
+    
+    # Set up key hooks instead of blocking wait
+    keyboard.add_hotkey('k', toggle_auto_clicking)
+    
+    # Wait for q to exit
+    keyboard.wait('q')
+    stop_auto_clicking()
+    with print_lock:
+        print("Exiting program.", flush=True)
 
 if __name__ == "__main__":
     try:
