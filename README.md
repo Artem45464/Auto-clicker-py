@@ -70,7 +70,3 @@ If you encounter permission issues:
 - On macOS, ensure you've given Terminal/application accessibility permissions in System Preferences > Security & Privacy > Privacy > Accessibility
 - On Windows, run the script as Administrator
 - On Linux, you may need to run with sudo or adjust input device permissions
-
-## Disclaimer
-
-This tool is intended for legitimate use cases such as testing or automation. Using auto-clickers for online games may violate terms of service.
