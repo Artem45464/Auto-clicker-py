@@ -12,6 +12,7 @@ def auto_click():
     target_cps = 20  
     interval = 1 / target_cps  
     next_time = time.perf_counter()
+    
     while auto_clicking.is_set():
         mouse.click(Button.left, 1)
         next_time += interval
@@ -26,10 +27,11 @@ def toggle_auto_clicking():
         start_auto_clicking()
 
 def start_auto_clicking():
-    """Start auto-clicking in a separate thread."""
+    """Start auto-clicking in a separate thread if not already running."""
     if not auto_clicking.is_set():
         auto_clicking.set()
-        threading.Thread(target=auto_click, daemon=True).start()
+        thread = threading.Thread(target=auto_click, daemon=True)
+        thread.start()
         with print_lock:
             print("Auto-clicker started.", flush=True)
 
@@ -48,11 +50,12 @@ def main():
     # Set up key hooks instead of blocking wait
     keyboard.add_hotkey('k', toggle_auto_clicking)
     
-    # Wait for q to exit
-    keyboard.wait('q')
-    stop_auto_clicking()
-    with print_lock:
-        print("Exiting program.", flush=True)
+    try:
+        keyboard.wait('q')  # Wait for 'q' to be pressed to exit
+    finally:
+        stop_auto_clicking()
+        with print_lock:
+            print("Exiting program.", flush=True)
 
 if __name__ == "__main__":
     try:
