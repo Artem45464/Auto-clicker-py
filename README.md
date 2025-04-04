@@ -2,6 +2,13 @@
 
 A lightweight Python utility that automates mouse clicking at 20 clicks per second. Perfect for testing, automation tasks, or games that require rapid clicking.
 
+## Features
+
+- Precise timing mechanism for accurate 20 CPS (clicks per second)
+- Thread-safe implementation for smooth operation
+- Simple keyboard controls
+- Low resource usage
+
 ## Controls
 
 The controls are as follows:
@@ -43,7 +50,6 @@ To run the Python script with administrator permissions on macOS, prepend sudo t
 ```bash
 sudo python3 main.py
 ```
-
 For Windows, run Command Prompt as Administrator and navigate to your script directory before executing.
 
 ### Verify pynput Version
@@ -52,11 +58,17 @@ Check the currently installed version of the pynput library:
 ```bash
 pip3 show pynput
 ```
-
 If you need to update to the latest version of pynput, use the following command:
 ```bash
 pip3 install --upgrade pynput
 ```
+
+## Code Overview
+
+The auto-clicker utilizes threading to handle continuous clicking without blocking the main program:
+- Uses threading.Event() for clean thread control
+- Implements a lock mechanism for thread-safe console output
+- Calculates precise sleep intervals to maintain accurate clicking rate
 
 ## Requirements
 
