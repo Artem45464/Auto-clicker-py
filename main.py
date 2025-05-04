@@ -48,7 +48,7 @@ def main():
         print("Press 'q' to exit the program.")
     
     # Set up key hooks instead of blocking wait
-    keyboard.add_hotkey('k', toggle_auto_clicking)
+    keyboard.add_hotkey("k", toggle_auto_clicking)
     
     try:
         keyboard.wait('q')  # Wait for 'q' to be pressed to exit
