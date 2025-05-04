@@ -1,16 +1,13 @@
 # Auto Clicker
-
 A lightweight Python utility that automates mouse clicking at 20 clicks per second. Perfect for testing, automation tasks, or games that require rapid clicking.
 
 ## Features
-
 - Precise timing mechanism for accurate 20 CPS (clicks per second)
 - Thread-safe implementation for smooth operation
 - Simple keyboard controls
 - Low resource usage
 
 ## Controls
-
 The controls are as follows:
 - Press "k" to start auto-clicking
 - Press "k" again to stop auto-clicking
@@ -19,7 +16,6 @@ The controls are as follows:
 ## Installation
 
 ### Create the .venv Folder
-
 To set up the virtual environment, run the following in your terminal:
 ```bash
 cd /Users/your_username/Desktop/Auto-clicker-py
@@ -27,7 +23,6 @@ python3 -m venv .venv
 ```
 
 ### Activate Your Virtual Environment
-
 Before installing any packages, make sure your virtual environment is activated:
 ```bash
 cd /Users/your_username/Desktop/Auto-clicker-py
@@ -36,7 +31,6 @@ source .venv/bin/activate
 If the terminal prompt shows (.venv) at the beginning, it means the virtual environment is active.
 
 ### Install Required Packages
-
 Install the necessary dependencies:
 ```bash
 pip3 install pynput keyboard
@@ -45,7 +39,6 @@ pip3 install pynput keyboard
 ## Usage
 
 ### Run Script as Administrator
-
 To run the Python script with administrator permissions on macOS, prepend sudo to your script execution:
 ```bash
 sudo python3 main.py
@@ -53,7 +46,6 @@ sudo python3 main.py
 For Windows, run Command Prompt as Administrator and navigate to your script directory before executing.
 
 ### Verify pynput Version
-
 Check the currently installed version of the pynput library:
 ```bash
 pip3 show pynput
@@ -64,20 +56,17 @@ pip3 install --upgrade pynput
 ```
 
 ## Code Overview
-
 The auto-clicker utilizes threading to handle continuous clicking without blocking the main program:
 - Uses threading.Event() for clean thread control
 - Implements a lock mechanism for thread-safe console output
 - Calculates precise sleep intervals to maintain accurate clicking rate
 
 ## Requirements
-
 - Python 3.6+
 - pynput library
 - keyboard library
 
 ## Troubleshooting
-
 If you encounter permission issues:
 - On macOS, ensure you've given Terminal/application accessibility permissions in System Preferences > Security & Privacy > Privacy > Accessibility
 - On Windows, run the script as Administrator
