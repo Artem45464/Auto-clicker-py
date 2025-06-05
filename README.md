@@ -18,14 +18,14 @@ The controls are as follows:
 ### Create the .venv Folder
 To set up the virtual environment, run the following in your terminal:
 ```bash
-cd /Users/your_username/Desktop/Auto-clicker-py
+cd /Users/your_username/Desktop/Auto-clicker-py-main
 python3 -m venv .venv
 ```
 
 ### Activate Your Virtual Environment
 Before installing any packages, make sure your virtual environment is activated:
 ```bash
-cd /Users/your_username/Desktop/Auto-clicker-py
+cd /Users/your_username/Desktop/Auto-clicker-py-main
 source .venv/bin/activate
 ```
 If the terminal prompt shows (.venv) at the beginning, it means the virtual environment is active.
