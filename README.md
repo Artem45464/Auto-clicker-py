@@ -33,17 +33,17 @@ If the terminal prompt shows (.venv) at the beginning, it means the virtual envi
 ### Install Required Packages
 Install the necessary dependencies:
 ```bash
-pip3 install pynput keyboard
+pip3 install pynput
 ```
 
 ## Usage
 
-### Run Script as Administrator
-To run the Python script with administrator permissions on macOS, prepend sudo to your script execution:
+### Run Script
+To run the Python script:
 ```bash
-sudo python3 main.py
+python3 main.py
 ```
-For Windows, run Command Prompt as Administrator and navigate to your script directory before executing.
+No administrator permissions are required.
 
 ### Verify pynput Version
 Check the currently installed version of the pynput library:
@@ -59,15 +59,15 @@ pip3 install --upgrade pynput
 The auto-clicker utilizes threading to handle continuous clicking without blocking the main program:
 - Uses threading.Event() for clean thread control
 - Implements a lock mechanism for thread-safe console output
-- Calculates precise sleep intervals to maintain accurate clicking rate
+- Uses a schedule-based timing mechanism for precisely 20 clicks per second
+- Uses pynput for both mouse control and keyboard input
 
 ## Requirements
 - Python 3.6+
 - pynput library
-- keyboard library
 
 ## Troubleshooting
-If you encounter permission issues:
+If you encounter issues:
 - On macOS, ensure you've given Terminal/application accessibility permissions in System Preferences > Security & Privacy > Privacy > Accessibility
-- On Windows, run the script as Administrator
-- On Linux, you may need to run with sudo or adjust input device permissions
+- On Windows, no special permissions are required
+- On Linux, you may need to adjust input device permissions
