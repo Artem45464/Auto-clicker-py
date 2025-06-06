@@ -1,31 +1,40 @@
 import time
 import threading
-from pynput.mouse import Button, Controller
-import keyboard
+from pynput.mouse import Button, Controller as MouseController
+from pynput.keyboard import Key, Listener, KeyCode
+import sys
 
-mouse = Controller()
+mouse = MouseController()
 auto_clicking = threading.Event()
 print_lock = threading.Lock()  # Ensure thread-safe prints
+click_thread = None
+keyboard_listener = None
 
 def auto_click():
-    """Continuously clicks at 20 CPS until stopped, with accurate timing."""
-    target_cps = 20  
-    interval = 1 / target_cps  
-    start_time = time.perf_counter()
-    click_count = 0
+    """Continuously clicks at exactly 20 CPS until stopped, with accurate timing."""
+    target_cps = 20.0  # Ensure it's exactly 20.0
+    interval = 1 / target_cps
+    
+    # Use time.time() for more consistent timing over longer periods
+    next_click_time = time.time()
     
     while auto_clicking.is_set():
-        current_time = time.perf_counter()
-        # Reset timing if we've fallen too far behind
-        if current_time - start_time > interval * click_count + interval * 5:
-            start_time = current_time
-            click_count = 0
+        current_time = time.time()
+        
+        # If it's time for the next click
+        if current_time >= next_click_time:
+            # Perform the click
+            mouse.click(Button.left, 1)
             
-        mouse.click(Button.left, 1)
-        click_count += 1
-        next_time = start_time + (click_count * interval)
-        sleep_time = max(0, next_time - time.perf_counter())
-        time.sleep(sleep_time)
+            # Calculate next click time (exactly 50ms later)
+            next_click_time = next_click_time + interval
+            
+            # If we've fallen too far behind, reset timing
+            if current_time > next_click_time + interval * 5:
+                next_click_time = current_time + interval
+        
+        # Small sleep to prevent CPU hogging
+        time.sleep(0.001)
 
 def toggle_auto_clicking():
     """Toggle auto-clicking state."""
@@ -38,40 +47,58 @@ def toggle_auto_clicking():
 
 def start_auto_clicking():
     """Start auto-clicking in a separate thread if not already running."""
-    # No need for the if check since we're using a lock in toggle_auto_clicking
-    auto_clicking.set()
-    thread = threading.Thread(target=auto_click, daemon=True)
-    thread.start()
-    print("Auto-clicker started.", flush=True)
+    global click_thread
+    if not auto_clicking.is_set():
+        auto_clicking.set()
+        click_thread = threading.Thread(target=auto_click, daemon=True)
+        click_thread.start()
+        print("Auto-clicker started.", flush=True)
 
 def stop_auto_clicking():
     """Stop auto-clicking."""
-    auto_clicking.clear()
-    print("Auto-clicker stopped.", flush=True)
+    if auto_clicking.is_set():
+        auto_clicking.clear()
+        print("Auto-clicker stopped.", flush=True)
+
+def on_press(key):
+    """Handle key press events."""
+    try:
+        if key == KeyCode.from_char('k'):
+            toggle_auto_clicking()
+        elif key == KeyCode.from_char('q'):
+            # Stop listener
+            return False
+    except AttributeError:
+        pass
+    return True
 
 def main():
-    """Monitor keypresses."""
+    """Monitor keypresses using pynput instead of keyboard library."""
+    global keyboard_listener
+    
     with print_lock:
         print("Press 'k' to start/stop the auto-clicker.")
         print("Press 'q' to exit the program.")
     
-    # Register hotkey
-    keyboard.on_press_key("k", lambda e: toggle_auto_clicking())
+    # Start keyboard listener
+    keyboard_listener = Listener(on_press=on_press)
+    keyboard_listener.start()
     
     try:
-        keyboard.wait('q')  # Wait for 'q' to be pressed to exit
+        keyboard_listener.join()  # Wait until listener stops
     finally:
         with print_lock:
             stop_auto_clicking()
-            # Clean up keyboard hooks
-            keyboard.unhook_all()
             print("Exiting program.", flush=True)
 
 if __name__ == "__main__":
     try:
         main()
-    except KeyboardInterrupt:
+    except Exception as e:
         with print_lock:
-            stop_auto_clicking()
-            keyboard.unhook_all()
-            print("\nProgram interrupted. Exiting...")
+            if auto_clicking.is_set():
+                stop_auto_clicking()
+            if keyboard_listener:
+                keyboard_listener.stop()
+            print(f"\nError: {e}", flush=True)
+            sys.exit(1)
