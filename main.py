@@ -12,33 +12,20 @@ keyboard_listener = None
 
 def auto_click():
     """Continuously clicks at exactly 20 CPS until stopped, with accurate timing."""
-    target_cps = 20.0  # Ensure it's exactly 20.0
+    target_cps = 20.0
     interval = 1 / target_cps
-    
-    # Use time.time() for more consistent timing over longer periods
     next_click_time = time.time()
-    
     while auto_clicking.is_set():
         current_time = time.time()
-        
-        # If it's time for the next click
         if current_time >= next_click_time:
-            # Perform the click
             mouse.click(Button.left, 1)
-            
-            # Calculate next click time (exactly 50ms later)
-            next_click_time = next_click_time + interval
-            
-            # If we've fallen too far behind, reset timing
+            next_click_time += interval
             if current_time > next_click_time + interval * 5:
                 next_click_time = current_time + interval
-        
-        # Small sleep to prevent CPU hogging
         time.sleep(0.001)
 
 def toggle_auto_clicking():
     """Toggle auto-clicking state."""
-    # Use threading.Lock to prevent race conditions
     with print_lock:
         if auto_clicking.is_set():
             stop_auto_clicking()
@@ -66,8 +53,7 @@ def on_press(key):
         if key == KeyCode.from_char('k'):
             toggle_auto_clicking()
         elif key == KeyCode.from_char('q'):
-            # Stop listener
-            return False
+            return False  # Stop listener
     except AttributeError:
         pass
     return True
@@ -75,30 +61,32 @@ def on_press(key):
 def main():
     """Monitor keypresses using pynput instead of keyboard library."""
     global keyboard_listener
-    
     with print_lock:
         print("Press 'k' to start/stop the auto-clicker.")
         print("Press 'q' to exit the program.")
-    
-    # Start keyboard listener
-    keyboard_listener = Listener(on_press=on_press)
-    keyboard_listener.start()
-    
     try:
-        keyboard_listener.join()  # Wait until listener stops
-    finally:
+        keyboard_listener = Listener(on_press=on_press)
+        keyboard_listener.start()
+        keyboard_listener.join()
+    except Exception as e:
         with print_lock:
-            stop_auto_clicking()
-            print("Exiting program.", flush=True)
+            print(f"\nError starting keyboard listener: {e}", flush=True)
+        raise
+    finally:
+        cleanup()
+
+def cleanup():
+    with print_lock:
+        stop_auto_clicking()
+        if keyboard_listener and hasattr(keyboard_listener, "running") and keyboard_listener.running:
+            keyboard_listener.stop()
+        print("Exiting program.", flush=True)
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
+        cleanup()
         with print_lock:
-            if auto_clicking.is_set():
-                stop_auto_clicking()
-            if keyboard_listener:
-                keyboard_listener.stop()
             print(f"\nError: {e}", flush=True)
-            sys.exit(1)
+        sys.exit(1)
