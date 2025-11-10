@@ -63,7 +63,7 @@ def stop_auto_clicking():
 def on_press(key):
     """Handle key press events."""
     try:
-        if key == KeyCode.from_char('l'):
+        if key == KeyCode.from_char('k'):
             toggle_auto_clicking()
         elif key == KeyCode.from_char('q'):
             return False  # Stop listener
