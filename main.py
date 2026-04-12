@@ -221,8 +221,8 @@ class AutoClicker:
         if self.keyboard_listener:
             try:
                 self.keyboard_listener.stop()
-            except Exception:
-                pass
+            except Exception as e:
+                self._safe_print(f"Listener stop error: {e}")
         
         self._safe_print("Program exited cleanly.")
 
