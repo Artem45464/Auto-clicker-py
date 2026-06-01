@@ -103,7 +103,7 @@ pip install --upgrade pynput
 ### Timing Accuracy
 - Uses `time.perf_counter()` for microsecond precision
 - Compensates for timing drift with schedule-based clicking
-- Resyncs if system falls behind by more than 5 intervals
+- Resyncs if system falls behind by more than 1 interval
 
 ### Safety Features
 - Prevents multiple simultaneous runs
