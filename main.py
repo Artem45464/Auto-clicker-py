@@ -33,11 +33,8 @@ class AutoClicker:
             sleep_time = next_click_time - current_time
             
             if sleep_time > 0:
-                # Only cap very small sleep times to prevent busy-waiting
-                # For normal operations, sleep the full duration
                 actual_sleep = max(sleep_time, 0.0001) if sleep_time < 0.001 else sleep_time
                 
-                # Check stop flag periodically during long sleeps
                 if actual_sleep > 0.01:
                     chunks = int(actual_sleep / 0.01)
                     remainder = actual_sleep % 0.01
@@ -60,8 +57,8 @@ class AutoClicker:
                 
             next_click_time += self.interval
             
-            # Resync if we've fallen too far behind
-            if current_time - next_click_time > self.interval * 5:
+            # Resync if we've fallen behind by more than one interval 
+            if current_time - next_click_time > self.interval:
                 next_click_time = current_time + self.interval
     
     def _safe_print(self, message):
@@ -75,7 +72,6 @@ class AutoClicker:
             if self._clicking.is_set():
                 return False
             
-            # Clean up any previous thread
             if self._click_thread is not None and self._click_thread.is_alive():
                 self._clicking.clear()
                 self._click_thread.join(timeout=max(2.0, self.interval * 3))
@@ -117,22 +113,18 @@ class AutoClicker:
             self._safe_print(f"Invalid CPS: {cps}. Must be between 1-1000.")
             return False
         
-        # Use the lock to prevent race conditions
         with self._click_lock:
             was_running = self._clicking.is_set()
             
             if was_running:
                 self._clicking.clear()
-                # Wait for thread to finish
                 if self._click_thread is not None and self._click_thread.is_alive():
                     self._click_thread.join(timeout=max(2.0, self.interval * 3))
             
-            # Update CPS
             self.target_cps = cps
             self.interval = 1.0 / cps
             self._safe_print(f"CPS set to {cps}")
             
-            # Restart if it was running
             if was_running:
                 self._clicking.set()
                 self._click_thread = threading.Thread(
@@ -154,7 +146,7 @@ class AutoClicker:
         if char == 'k':
             self.toggle()
         elif char == 'q':
-            return False  # Stop listener
+            return False
         elif char == '+' or char == '=':
             new_cps = min(self.target_cps + 5, 1000)
             self.set_cps(new_cps)
@@ -166,7 +158,6 @@ class AutoClicker:
     
     def run(self):
         """Start the keyboard listener and run the program."""
-        # Prevent multiple simultaneous runs
         with self._running_lock:
             if self._is_running:
                 self._safe_print("Program is already running!")
@@ -202,22 +193,18 @@ class AutoClicker:
     def cleanup(self):
         """Clean up all resources."""
         with self._click_lock:
-            # Prevent double cleanup - now thread-safe
             if self._cleanup_done:
                 return
             self._cleanup_done = True
-            self._stop_flag.set()  # Signal all threads to stop
+            self._stop_flag.set()
             
-            # Stop clicking
             if self._clicking.is_set():
                 self._clicking.clear()
             
             if self._click_thread is not None and self._click_thread.is_alive():
-                # Use dynamic timeout based on CPS
                 timeout = max(3.0, self.interval * 5)
                 self._click_thread.join(timeout=timeout)
         
-        # Stop keyboard listener (outside lock to avoid potential deadlock)
         if self.keyboard_listener:
             try:
                 self.keyboard_listener.stop()
