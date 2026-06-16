@@ -4,6 +4,7 @@ from pynput.mouse import Button, Controller as MouseController
 from pynput.keyboard import Listener, KeyCode
 import sys
 
+
 class AutoClicker:
     """Thread-safe auto-clicker with precise timing control."""
     
@@ -57,9 +58,10 @@ class AutoClicker:
                 
             next_click_time += self.interval
             
-            # Resync if we've fallen behind by more than one interval 
-            if current_time - next_click_time > self.interval:
-                next_click_time = current_time + self.interval
+            # FIXED: proper resync timing
+            now = perf()
+            if now - next_click_time > self.interval:
+                next_click_time = now + self.interval
     
     def _safe_print(self, message):
         """Thread-safe printing."""
